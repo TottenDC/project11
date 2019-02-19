@@ -4,6 +4,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const apiRouter = require('./routes');
 
 const app = express();
 
@@ -26,7 +27,12 @@ db.once('open', () => {
 // morgan gives us http request logging
 app.use(morgan('dev'));
 
+// parse incomming JSON
+app.use(express.json());
+
 // TODO add additional routes here
+
+app.use('/api', apiRouter);
 
 // send a friendly greeting for the root route
 app.get('/', (req, res) => {

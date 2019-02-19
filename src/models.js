@@ -21,7 +21,7 @@ const validator = (value) => {
 const emailValidation = [validator, 'Please enter a valid email.']
 
 // Schemas
-const User = new Schema({
+const UserSchema = new Schema({
     fullName: {
         type: String, 
         required: [true, 'User name is required.']
@@ -40,7 +40,7 @@ const User = new Schema({
     }
 });
 
-const Review = new Schema({
+const ReviewSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId, ref: 'User'
     },
@@ -57,7 +57,7 @@ const Review = new Schema({
     review: String
 });
 
-const Course = new Schema({
+const CourseSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId, ref: 'User'
     },
@@ -88,6 +88,11 @@ const Course = new Schema({
         {type: Schema.Types.ObjectId, ref: 'Review'}
     ]
 });
+
+// Create models
+const User = mongoose.model('User', UserSchema);
+const Review = mongoose.model('Review', ReviewSchema);
+const Course = mongoose.model('Course', CourseSchema);
 
 module.exports.User = User;
 module.exports.Course = Course;
