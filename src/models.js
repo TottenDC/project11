@@ -52,7 +52,7 @@ const ReviewSchema = new Schema({
         type: Number, 
         required: [true, 'Please provide a rating.'],
         min: [1, 'Cannot rate lower than 1.'], 
-        max: [5, 'Cannot rate higher than five.']
+        max: [5, 'Cannot rate higher than 5.']
     },
     review: String
 });
