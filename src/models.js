@@ -2,6 +2,7 @@
 
 // load modules
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const Schema = mongoose.Schema;
 
@@ -88,6 +89,37 @@ const CourseSchema = new Schema({
         {type: Schema.Types.ObjectId, ref: 'Review'}
     ]
 });
+
+// User methods
+// Hash passwords
+UserSchema.pre('save', function(next) { 
+    bcrypt.hash(this.password, 10, (err, hash) => {
+        if (err) return next(err);
+        this.password = hash;
+        next();
+    });
+});
+
+// Authenticate User
+UserSchema.statics.authenticate = function(email, password, callback) {
+    User.findOne({ emailAddress: email })
+        .exec((err, user) => {
+            if (err) {
+                return callback(err);
+            } else if (!user) {
+                const error = new Error('User not found.');
+                error.status = 401;
+                return callback(error);
+            }
+            bcrypt.compare(password, user.password, (err, result) => {
+                if (result) {
+                    return callback(null, user);
+                } else {
+                    return callback();
+                }
+            });
+        });
+};
 
 // Create models
 const User = mongoose.model('User', UserSchema);

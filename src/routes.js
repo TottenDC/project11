@@ -2,6 +2,7 @@
 
 // load modules
 const express = require('express');
+const auth = require('basic-auth');
 const router = express.Router();
 const {User, Course, Review} = require('./models');
 
@@ -24,13 +25,37 @@ router.param('courseId', (req, res, next,id) => {
         
 });
 
+// Authentication Middleware
+const authenticateUser = (req, res, next) => {
+    const credentials = auth(req);
+    if (credentials) {
+        User.authenticate(credentials.name, credentials.pass, (err, user) => {
+            if (err || !user) {
+                const error = new Error('Wrong email or password.');
+                error.status = 401;
+                return next(error);
+            }
+            req.currentUser = user;
+            return next();
+        }); 
+    } else {
+        const err = new Error('Provide credentials.');
+        err.status = 400;
+        return next(err);
+    }
+};
+
 // User routes
-// TODO add authentication and finish route
-router.get('/users', (req, res, next) => {
-    next();
+router.get('/users', authenticateUser, (req, res, next) => {
+    res.json(req.currentUser);
 });
 
 router.post('/users', (req, res, next) => {
+    if (req.body.password !== req.body.confirmPassword) {
+        const err = new Error('Passwords do not match.');
+        err.status = 400;
+        return next(err);
+    }
     let user = new User(req.body);
     user.save((err, user) => {
         if (err) {
@@ -58,11 +83,11 @@ router.get('/courses/:courseId', (req, res, next) => {
     });
 });
 
-// TODO flesh out the data given to include the current user
-// * Possily use Object.assign(), spread operator, or deep clone the object, then add it (see Object.assign() MDN).
-router.post('/courses', (req, res, next) => {
-    let course = new Course(req.body);
-    course.save((err, course) => {
+router.post('/courses', authenticateUser, (req, res, next) => {
+    let user = {"user": req.currentUser._id};
+    let course = Object.assign(user, req.body);
+    let createCourse = new Course(course);
+    createCourse.save((err, course) => {
         if (err) {
             err.status = 400;
             return next(err);
@@ -73,8 +98,8 @@ router.post('/courses', (req, res, next) => {
     });
 });
 
-router.put('/courses/:courseId', (req, res, next) => {
-    Course.update(req.course, req.body, (err, result) => {
+router.put('/courses/:courseId', authenticateUser, (req, res, next) => {
+    Course.updateOne(req.course, req.body, (err, result) => {
         if (err) {
             err.status = 400;
             return next(err);
@@ -83,11 +108,11 @@ router.put('/courses/:courseId', (req, res, next) => {
     });
 });
 
-// TODO flesh out the data given to include the current user
-// * Possily use Object.assign(), spread operator, or deep clone the object, then add it (see Object.assign() MDN).
-router.post('/courses/:courseId/reviews', (req, res, next) => {
-    let review = new Review(req.body);
-    review.save((err, review) => {
+router.post('/courses/:courseId/reviews', authenticateUser, (req, res, next) => {
+    let user = {"user": req.currentUser._id};
+    let review = Object.assign(user, req.body);
+    let createReview = new Review(review);
+    createReview.save((err, review) => {
         if (err) {
             err.status = 400;
             return next(err);
