@@ -99,7 +99,7 @@ router.post('/courses', authenticateUser, (req, res, next) => {
 });
 
 router.put('/courses/:courseId', authenticateUser, (req, res, next) => {
-    Course.updateOne(req.course, req.body, (err, result) => {
+    Course.updateOne(req.course, req.body, {runValidators: true}, (err, result) => {
         if (err) {
             err.status = 400;
             return next(err);
@@ -109,6 +109,11 @@ router.put('/courses/:courseId', authenticateUser, (req, res, next) => {
 });
 
 router.post('/courses/:courseId/reviews', authenticateUser, (req, res, next) => {
+    if (String(req.currentUser._id) === String(req.course.user)) {
+        const err = new Error('Cannot post a review to your own course.');
+        err.status = 400;
+        return next(err);
+    }
     let user = {"user": req.currentUser._id};
     let review = Object.assign(user, req.body);
     let createReview = new Review(review);

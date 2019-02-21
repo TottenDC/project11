@@ -7,13 +7,9 @@ const bcrypt = require('bcrypt');
 const Schema = mongoose.Schema;
 
 // Set up custom email validation
-const validator = (value) => {
-    if (/\w@\w/.test(value)) {
-        if (/(\.com)$/.test(value)) {
-            return true;
-        } else {
-            return false;
-        }
+function validator (value) {
+    if (/\w@\w+(\.com)$/.test(value)) {
+        return true;
     } else {
         return false;
     }
