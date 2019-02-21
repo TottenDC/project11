@@ -77,9 +77,16 @@ router.get('/courses', (req, res, next) => {
 });
 
 router.get('/courses/:courseId', (req, res, next) => {
-    Course.populate(req.course, {path: 'user reviews'}, (err, course) => {
-        if (err) return next(err);
-        res.json(course);
+    Course.populate(req.course, 
+        [
+            {path: 'user', select: '_id fullName'}, 
+            {path: 'reviews', model: 'Review', populate: 
+                {path: 'user', model: 'User', select: '_id fullName'}
+            }
+        ], 
+        (err, course) => {
+            if (err) return next(err);
+            res.json(course);
     });
 });
 
