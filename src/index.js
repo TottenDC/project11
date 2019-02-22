@@ -25,12 +25,13 @@ db.once('open', () => {
 });
 
 // morgan gives us http request logging
-app.use(morgan('dev'));
+// turn morgan off for testing
+if (process.env.NODE_ENV !== 'test') {
+  app.use(morgan('dev'));
+}
 
 // parse incomming JSON
 app.use(express.json());
-
-// TODO add additional routes here
 
 app.use('/api', apiRouter);
 
@@ -67,3 +68,4 @@ const server = app.listen(app.get('port'), () => {
   console.log(`Express server is listening on port ${server.address().port}`);
 });
  
+module.exports = app;

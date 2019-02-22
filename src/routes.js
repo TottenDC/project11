@@ -51,7 +51,11 @@ router.get('/users', authenticateUser, (req, res, next) => {
 });
 
 router.post('/users', (req, res, next) => {
-    if (req.body.password !== req.body.confirmPassword) {
+    if (! req.body.confirmPassword) {
+        const err = new Error('Please confirm password.');
+        err.status = 400;
+        return next(err);
+    } else if (req.body.password !== req.body.confirmPassword) {
         const err = new Error('Passwords do not match.');
         err.status = 400;
         return next(err);
