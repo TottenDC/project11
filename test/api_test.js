@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const expect = chai.expect;
-const {User, Course} = require('../src/models');
+const {User} = require('../src/models');
 const app = require('../src/index');
 
 chai.use(chaiHttp);
