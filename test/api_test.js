@@ -14,9 +14,9 @@ describe('Course-api', () => {
     before((done) => {
         User.create({
             fullName: 'Test McTester',
-                emailAddress: 'this_is@atest.com',
-                password: 'testpassword',
-                confirmPassword: 'testpassword'
+            emailAddress: 'this_is@atest.com',
+            password: 'testpassword',
+            confirmPassword: 'testpassword'
         }, (err, user) => {
             if (err) console.error(err);
             done();
